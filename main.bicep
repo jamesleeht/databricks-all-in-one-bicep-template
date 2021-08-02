@@ -29,8 +29,6 @@ var fwRoutingTable = '${substring(uString, 0, 6)}AdbRoutingTbl'
 var clientPcName = '${substring(uString, 0, 6)}ClientPc'
 var eHNameSpace = '${substring(uString, 0, 6)}eh'
 var adbAkvLinkName = '${substring(uString, 0, 6)}SecretScope'
-// creating the event hub same as namespace
-var eventHubName = eHNameSpace
 var managedIdentityName = '${substring(uString, 0, 6)}Identity'
 
 @description('Default location of the resources')
@@ -137,13 +135,10 @@ module adb './databricks/workspace.template.bicep' = {
   scope: rg
   name: 'DatabricksWorkspace'
   params: {
-    vnetName: spokeVnetName
+    vnetName: vnets.outputs.spokeVnetName
     adbWorkspaceSkuTier: 'premium'
     adbWorkspaceName: adbWorkspaceName
   }
-  dependsOn:[
-    vnets
-  ]
 }
 
 module hubFirewall './network/firewall.template.bicep' = {
@@ -152,7 +147,7 @@ module hubFirewall './network/firewall.template.bicep' = {
   params: {
     firewallName: firewallName
     publicIpAddressName: firewallPublicIpName
-    vnetName: hubVnetName
+    vnetName: vnets.outputs.hubVnetName
     webappDestinationAddresses: webappDestinationAddresses
     logBlobstorageDomains: logBlobstorageDomains
     infrastructureDestinationAddresses: extendedInfraIp
@@ -189,7 +184,7 @@ module clientpc './other/clientdevice.template.bicep' = {
   params: {
     adminUsername: adminUsername
     adminPassword: adminPassword
-    vnetName: hubVnetName
+    vnetName: vnets.outputs.hubVnetName
     clientPcName: clientPcName
   }
 }
@@ -216,12 +211,12 @@ module privateEndPoints './network/privateendpoint.template.bicep' = {
     privateLinkSubnetId: vnets.outputs.privatelinksubnet_id
     storageAccountName: adlsGen2.name
     storageAccountPrivateLinkResource: adlsGen2.outputs.storageaccount_id
-    eventHubName: eventHubName
+    eventHubName: eventHubLogging.outputs.eHName
     eventHubPrivateLinkResource: eventHubLogging.outputs.eHNamespaceId
     targetSubResourceDfs: 'dfs'
     targetSubResourceVault: 'vault'
     targetSubResourceEventHub: 'namespace'
-    vnetName: spokeVnetName
+    vnetName: vnets.outputs.spokeVnetName
   }
 }
 

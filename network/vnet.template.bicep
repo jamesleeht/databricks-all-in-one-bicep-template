@@ -176,4 +176,6 @@ resource spokeVnetName_Peer_SpokeHub 'Microsoft.Network/virtualNetworks/virtualN
 
 // output spoke_vnet_id string = spokeVnetName_resource.id
 output privatelinksubnet_id string = resourceId('Microsoft.Network/virtualNetworks/subnets', spokeVnetName, privatelinkSubnetName)
+output hubVnetName string = hubVnetName
+output spokeVnetName string = spokeVnetName
 // output spoke_vnet_name string= spokeVnetName
